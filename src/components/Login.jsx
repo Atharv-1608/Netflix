@@ -44,7 +44,7 @@ const Login = () => {
           />
         )}
         <input type="text" ref={email} placeholder='Email' className='p-4 rounded-md my-4 w-full bg-gray-700' />
-        <input type="password" ref={password} placeholder='password' className='p-4 rounded-md my-4 w-full bg-gray-700' />
+        <input type="password" ref={password} placeholder='Password' className='p-4 rounded-md my-4 w-full bg-gray-700' />
         <button className='bg-red-700 p-4 my-4 rounded-lg w-full ' 
           onClick={handleButtonClick}
         >{ 
@@ -64,3 +64,4 @@ const Login = () => {
 }
 
 export default Login
+
