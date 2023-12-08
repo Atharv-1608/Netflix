@@ -1,11 +1,19 @@
 import React, { useRef, useState } from 'react'
 import Header from './Header'
 import {checkValidData} from '../utils/validate'
-
+import {auth} from '../utils/firebase'
+import { createUserWithEmailAndPassword , signInWithEmailAndPassword, updateProfile} from "firebase/auth"
+import { useDispatch } from 'react-redux'
+import { addUser } from '../utils/userSlice'
+import {PHOTO} from '../utils/constants'
 const Login = () => {
   
   const [isSignInForm,setIsSignInForm] = useState(true)
   const [errorMessage,setErrorMessage] = useState(null)
+  const email = useRef(null);
+  const password = useRef(null);
+  const name = useRef(null);
+  const dispatch = useDispatch();
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
@@ -14,18 +22,49 @@ const Login = () => {
   const handleButtonClick = () => {
     const message = checkValidData(email.current.value,password.current.value)
     setErrorMessage(message);
-    console.log(message)
-  
-    console.log(email.current.value)
-    console.log(password.current.value)
+    if (message) return;
+
+    if (!isSignInForm){
+      createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+      .then((userCredential) => {
+         
+        const user = userCredential.user;
+        updateProfile(user, {
+          displayName: name.current.value, photoURL: PHOTO
+        }).then(() => {
+          const {uid,displayName,email} = auth.currentUser;
+        dispatch(addUser(
+          {
+            uid:uid,email:email,displayName:displayName
+          }
+          ));
+        }).catch((error) => {
+          navigate('/error')
+        });
+        
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setErrorMessage(errorCode + "-" + errorMessage)
+        
+      });
+    }
+    else{
+      signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+     
+    const user = userCredential.user;
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    setErrorMessage(errorCode + "-" + errorMessage)
+  });
+    }
 
   };
-  
-  const email = useRef(null);
-  const password = useRef(null);
-  const name = useRef(null);
 
-  
   return (
     
     <div>
